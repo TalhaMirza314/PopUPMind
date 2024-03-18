@@ -4,27 +4,18 @@
     <script src="aframe.min.js"></script>
     <script src="mindar-face-aframe.prod.js"></script>
 <!--     <script> document.addEventListener("DOMContentLoaded", function () { }) </script> -->
-<!-- <style>
+<style>
 
-.a-dom-overlay:not(.a-no-style)>* {
-            pointer-events: none;
-
-        }
-
-        .a-canvas.a-grab-cursor:hover {
-            cursor: none;
-            cursor: -moz-grab;
-            cursor: -webkit-grab;
-        }
-
-        canvas.a-canvas.a-mouse-cursor-hover:hover {
-            cursor: not-allowed;
-        }
-    </style> -->
+@media only screen and (max-width: 768px) {
+    .example-container {
+    width: 50%;
+    }
+}
+</style>
 </head>
 
 <body>
-    <div class="example-container">
+    <div class="example-container" style="width:650px; height:500px;">
         <a-scene mindar-face embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights"
             vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false"> <a-assets> <a-asset-item
                     id="headModel"
