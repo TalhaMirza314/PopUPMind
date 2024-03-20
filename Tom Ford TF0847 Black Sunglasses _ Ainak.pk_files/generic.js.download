@@ -1,0 +1,135 @@
+// $(document).ready(function () {
+//     $('#icon-search').on('click', function (e) {
+//         e.preventDefault()
+//         // alert('test');
+//         var value_S = $('#s').val();
+//         if (value_S != '') {
+//             $('#searchform').submit();
+//         }
+//     });
+
+//     $('.lasses-cart-search')
+//     if ($(window).width() > 768) {
+//         $('.search-form-li').on('click', function () {
+//             //alert('test');
+//             $(this).find('i').toggleClass('fa-search fa-times')
+//             $('.glasses-custom-form').toggle();
+//         });
+//         if ($('ul>li').hasClass('has-submenu')) {
+//             $('.has-submenu').hover(function () {
+//                 $('.qrt-nav-menu').addClass('open-menu');
+//             }, function () {
+//                 $('.qrt-nav-menu').removeClass('open-menu');
+//             }
+
+//             );
+//         }
+//     }
+
+// });
+// $(document).ready(function () {
+// $('#cart').on('click', function () {
+//     alert('')
+//     $('.glasses-custom-form').css('display', 'block!important')
+// });
+// });
+
+
+$('#cart').on('click', function (e) {
+  e.preventDefault();
+  // alert('')
+  if ($(this).find('fas').hasClass('fa-search')) {
+    $(this).find('fas').removeClass('fa-search').addClass('fa-times');
+  } else {
+    $(this).find('fas').removeClass('fa-times').addClass('fa-search');
+  }
+  // $('.glasses-custom-form').toggle();
+  $('.search-main').slideToggle();
+  $('#headert-search-id').focus()
+});;
+$('.search-close-header').on('click', function (e) {
+  e.preventDefault();
+  $('.search-main').slideToggle();
+  // if ($('.eeded').hasClass('fa-search')) {
+  //   $('.eeded').removeClass('fa-search').addClass('fa-times');
+  // }else{
+  //   $('.eeded').removeClass('fa-times').addClass('fa-search');
+  // }
+})
+
+$(document).ready(function () {
+  // Get the form element
+  const form = document.querySelector('.mega-menu-search-form');
+
+  // Add an event listener for form submission
+  form.addEventListener('submit', function (event) {
+    // Prevent the default form submission
+    event.preventDefault();
+
+    // Get the input value
+    const inputValue = document.getElementById('headert-search-id').value;
+
+    // Sanitize the input value
+    const sanitizedValue = encodeURIComponent(inputValue);
+
+    // Construct the URL with the sanitized value
+    const url = `https://ainak.pk/search/?s=${sanitizedValue}`;
+
+    // Redirect to the constructed URL
+    window.location.href = url;
+  });
+
+  function performSearch() {
+    $.ajax({
+      url: 'https://ainak.pk/header-search.php',
+      method: 'POST',
+      success: function (response) {
+        $('.search-see-alll').show();
+        $('.recommend-list').html(response);
+      }
+    });
+  }
+
+  performSearch();
+
+  $('#headert-search-id').on('keyup', function () {
+    //  alert('wqdwd')
+    var query = $(this).val();
+    if (query.trim() !== '') {
+      $.ajax({
+        url: 'https://ainak.pk/header-search.php',
+        method: 'POST',
+        data: { query: query },
+        success: function (response) {
+          $('.search-see-alll').show();
+          $('.recommend-list').html(response);
+        }
+      });
+    } else {
+      performSearch();
+    }
+  });
+});
+
+$('.search-see-alll').on('click', function () {
+  $('.mega-menu-search-form').submit();
+})
+
+
+$(document).ready(function () {
+  var header = $('.header');
+  var stickyClass = 'sticky-header';
+  var headerHeight = header.outerHeight();
+
+  $(window).on('scroll', function () {
+    if ($(window).scrollTop() > headerHeight) {
+      header.addClass(stickyClass);
+      $('wwd-header').addClass('main-row-header');
+      $('.header-top-bar').hide();
+    } else {
+      header.removeClass(stickyClass);
+      $('.header-top-bar').show();
+      $('wwd-header').removeClass('main-row-header');
+    }
+  });
+});

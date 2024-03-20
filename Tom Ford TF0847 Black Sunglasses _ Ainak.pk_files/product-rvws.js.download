@@ -1,0 +1,509 @@
+
+$(document).ready(function () {
+
+    $('.star-list i').click(function () {
+        var score = $(this).data('score');
+        var ratingType = $(this).closest('.star-list').attr('class').split(' ')[1]; // Extract the rating type
+
+        // Remove active-star class from all stars in the same rating
+        $('.' + ratingType + ' i').removeClass('active-star');
+
+        // Add active-star class to the clicked star and previous stars
+        $(this).prevAll().addBack().addClass('active-star');
+
+        // Update the corresponding hidden input value
+        $('input[name="' + ratingType + '"]').val(score);
+    });
+
+
+
+    load_data_review();
+
+    function load_data_review(query) {
+        // Get the product ID from the hidden field
+        var idd = $('.hidden-product-id').val();
+        var slugg = $('.hidden-product-slug').val();
+        var page_no = $('.pagination-num').val();
+        var sort_by = $('.sort-by-drop-ajax').val();
+
+        $.ajax({
+            url: "https://ainak.pk/fetch_all_product_reviews.php",
+            method: "POST",
+            data: {
+                query: query,
+                id: idd,
+                slug: slugg,
+                page: page_no,
+                sort_by: sort_by
+            },
+            cache: false,
+            success: function (data) {
+                //  console.log('data');
+                $('.reviewss').html(data);
+                // if (data) {
+                //    // $('#delete').show();
+                // }
+            }
+        });
+    }
+    $('.sort-by-drop-ajax').on('change', function () {
+
+        load_data_review();
+    })
+    $('.btn-next-reviews').on('click', function (e) {
+        e.preventDefault();
+
+        // Get product ID and current page number
+        var idd = $('.hidden-product-id').val();
+        var page_no = parseInt($('.pagination-num').val()) + 1;
+        var total_pages = parseInt($('.hidden-total-pages').val());
+
+        // Update the hidden field with the new page number
+        $('.pagination-num').val(page_no);
+        if (page_no <= total_pages) {
+            // Make AJAX request to fetch reviews for the next page
+            $.ajax({
+                url: "https://ainak.pk/fetch_all_product_reviews.php",
+                method: "POST",
+                data: {
+                    id: idd,
+                    page: page_no
+                },
+                cache: false,
+                success: function (data) {
+                    console.log(data);
+
+                    // Update the review list container with new reviews
+                    $('.reviewss').html(data);
+
+                    // Scroll to the top of the reviews container
+                    var reviewList = $('#reviewss');
+                    if (reviewList.length > 0) {
+                        $('html, body').animate({
+                            scrollTop: reviewList.offset().top
+                        }, 500);
+                    }
+                }
+            });
+        }
+    });
+    $('.btn-pre-reviews').on('click', function (e) {
+        e.preventDefault();
+
+        // Get product ID and current page number
+        var idd = $('.hidden-product-id').val();
+        var page_no = parseInt($('.pagination-num').val())
+        var total_pages = parseInt($('.hidden-total-pages').val());
+        if (page_no > 1 && total_pages < total_pages) {
+            page_no = parseInt($('.pagination-num').val()) - 1;
+
+
+
+            // Update the hidden field with the new page number
+            $('.pagination-num').val(page_no);
+
+            // Make AJAX request to fetch reviews for the next page
+            $.ajax({
+                url: "https://ainak.pk/fetch_all_product_reviews.php",
+                method: "POST",
+                data: {
+                    id: idd,
+                    page: page_no
+                },
+                cache: false,
+                success: function (data) {
+                    console.log(data);
+
+                    // Update the review list container with new reviews
+                    $('.reviewss').html(data);
+
+                    // Scroll to the top of the reviews container
+                    var reviewList = $('#reviewss');
+                    if (reviewList.length > 0) {
+                        $('html, body').animate({
+                            scrollTop: reviewList.offset().top
+                        }, 500);
+                    }
+                }
+            });
+        }
+    });
+    $('.rate-this-fram-tbn').on('click', function (e) {
+        e.preventDefault();
+        //  alert('test')
+        if ($('.write-reviews-container').hasClass('active')) {
+            $('.write-reviews-container').removeClass('active');
+            $('.write-review-overlay').removeClass('visible');
+            $("body").removeAttr("style");
+
+        } else {
+            $('.write-review-overlay').addClass('visible');
+            $('.write-reviews-container').addClass('active');
+            $('body').css('overflow-y', 'hidden');
+        }
+    })
+
+    $('.js-close-write-reviews').on('click', function (e) {
+        e.preventDefault();
+
+        $('.write-reviews-container').removeClass('active');
+        $('.write-review-overlay').removeClass('visible');
+        $("body").removeAttr("style");
+    })
+    $('.js-close-all-reviews-winodw').on('click', function (e) {
+        e.preventDefault();
+
+        $('.all-reviews-container').removeClass('active');
+        $('.write-review-overlay').removeClass('visible');
+        $("body").removeAttr("style");
+    })
+    $('.btn-add-review-all').on('click', function () {
+        $('.all-reviews-container').removeClass('active');
+        $('.write-reviews-container').addClass('active');
+    })
+
+
+    $('.read-al-reviews').on('click', function (e) {
+        e.preventDefault();
+        //  alert('test')
+
+        if ($('.all-reviews-container').hasClass('active')) {
+            $('.all-reviews-container').removeClass('active');
+            $('.write-review-overlay').removeClass('visible');
+            $("body").removeAttr("style");
+
+        } else {
+            $('.write-review-overlay').addClass('visible');
+            $('.all-reviews-container').addClass('active');
+            $('body').css('overflow-y', 'hidden');
+            load_data_review();
+        }
+    })
+
+    $('.js-select-pop-rev-all-reviews').on('click', function () {
+        if ($(this).hasClass('select-open')) {
+            $(this).removeClass('select-open');
+            $('.wede-icon-arrow-all').removeClass('fa-angle-down').addClass('fa-angle-up')
+        } else {
+            $(this).addClass('select-open')
+            $('.wede-icon-arrow-all').removeClass('fa-angle-up').addClass('fa-angle-down')
+        }
+    })
+    var scrollToReviewsLink = document.getElementById('scroll-to-reviews');
+    var reviewsSection = document.getElementById('reviews-section');
+
+    // Add a click event listener to the link
+    // scrollToReviewsLink.addEventListener('click', function (event) {
+    //     event.preventDefault();
+
+    //     // Scroll to the reviews section smoothly
+    //     reviewsSection.scrollIntoView({ behavior: 'smooth' });
+    // });
+//===============================================================================
+    // function handleRatingChange(ratingType, score) {
+    //     // Your custom logic when rating changes
+    //     console.log(ratingType + ' rating changed to: ' + score);
+    // }
+
+    // Handle hover, click, and change events for all star sections
+    // $('.star-list i').hover(
+    //     function () {
+    //         // On hover
+    //         var score = $(this).data('score');
+    //         $(this).parent().find('i').removeClass('active-star');
+    //         $(this).prevAll().addBack().addClass('active-star');
+    //     },
+    //     function () {
+    //         // On unhover
+    //         if (!$(this).parent().find('i').hasClass('clicked')) {
+    //             $(this).parent().find('i').removeClass('active-star');
+    //         }
+    //     }
+    // ).click(function () {
+    //     // On click
+    //     var score = $(this).data('score');
+    //     $(this).parent().find('i').removeClass('clicked');
+    //     $(this).prevAll().addBack().addClass('clicked');
+    //     $(this).closest('.fel-list').find('input[type="hidden"]').val(score);
+    //     var ratingType = $(this).closest('.list').find('.list-name').text();
+    //     handleRatingChange(ratingType, score);
+    // });
+
+    // $('.fel-list,.review-stars').on('change', function () {
+    //     var score = $(this).find('i.clicked').last().data('score');
+    //     $(this).find('input[type="hidden"]').val(score);
+    //     var ratingType = $(this).find('.list-name').text();
+    //     handleRatingChange(ratingType, score);
+    // });
+
+    // function handleFrameStarChange(score) {
+    //     // Your custom logic when frame-star rating changes
+    //     console.log('frame-star rating changed to: ' + score);
+    //     // Add your specific logic for frame-star here
+    // }
+
+    // function handleRatingChange(ratingType, score) {
+    //     // Your custom logic when rating changes
+    //     console.log(ratingType + ' rating changed to: ' + score);
+    // }
+
+    // // Handle hover, click, and change events for all star sections
+    // $('.star-list i').hover(
+    //     function () {
+    //         // On hover
+    //         var score = $(this).data('score');
+    //         $(this).parent().find('i').removeClass('active-star');
+    //         $(this).prevAll().addBack().addClass('active-star');
+    //     },
+    //     function () {
+    //         // On unhover
+    //         if (!$(this).parent().find('i').hasClass('clicked')) {
+    //             $(this).parent().find('i').removeClass('active-star');
+    //         }
+    //     }
+    // ).click(function () {
+    //     // On click
+    //     var score = $(this).data('score');
+    //     $(this).parent().find('i').removeClass('clicked');
+    //     $(this).prevAll().addBack().addClass('clicked');
+    //     $(this).closest('.fel-list').find('input[type="hidden"]').val(score);
+    //     var ratingType = $(this).closest('.list').find('.list-name').text();
+    //     handleRatingChange(ratingType, score);
+
+    //     // Update frame-star field value
+    //     var frameStarScore = $('.review-stars input[name="frame-star"]').val();
+    //     handleFrameStarChange(frameStarScore);
+    // });
+
+    // $('.fel-list,.review-stars').on('change', function () {
+    //     var score = $(this).find('i.clicked').last().data('score');
+    //     $(this).find('input[type="hidden"]').val(score);
+    //     var ratingType = $(this).find('.list-name').text();
+    //     handleRatingChange(ratingType, score);
+
+    //     // Update frame-star field value
+    //     var frameStarScore = $('.review-stars input[name="frame-star"]').val();
+    //     handleFrameStarChange(frameStarScore);
+    // });
+   
+
+    // Remove the global variable
+    // var idd = $('.hidden-product-id').val();
+
+    // Call the function without passing idd as a parameter
+
+
+    // Use event delegation to handle dynamically added elements
+    $(document).on('click', '.custom-thumb', function (e) {
+        e.preventDefault();
+
+        var review_id = $(this).data('review-id');
+        var clickedElement = $(this);
+
+        $.ajax({
+            url: "https://ainak.pk/helpful-unhelpful.php",
+            method: "POST",
+            data: {
+                review_id: review_id
+            },
+            cache: false,
+            success: function (data) {
+                console.log(data);
+                // Remove individual classes
+                $('.for-use-thumb-' + review_id).removeClass('far custom-thumb').addClass('fas liked');
+                $('.for-use-thumb-' + review_id).siblings('.helpful-text').find('.helpful-count').text(data)
+            }
+        });
+    });
+
+    // Use event delegation for dynamically added elements
+    $(document).on('click', '.liked', function (e) {
+        e.preventDefault();
+
+        var review_id = $(this).data('review-id');
+        var clickedElement = $(this);
+
+        $.ajax({
+            url: "https://ainak.pk/unhelpful.php",
+            method: "POST",
+            data: {
+                review_id: review_id
+            },
+            cache: false,
+            success: function (data) {
+                // console.log(data);
+                // Remove individual classes
+                $('.for-use-thumb-' + review_id).removeClass('fas liked').addClass('far custom-thumb');
+                // console.log(clickedElement.closest('.helpful-count'));
+                $('.for-use-thumb-' + review_id).siblings('.helpful-text').find('.helpful-count').text(data)
+                //clickedElement.parent().find('.helpful-count').text(data);
+            }
+        });
+    });
+    $('.rv-relevance-most-drp').on('change', function () {
+        $('#sort-by-id').submit();
+    })
+    $('.js-close-review-success').on('click', function () {
+        $('.review-submit-popup').hide();
+        location.reload();
+        $('html, body').animate({
+            scrollTop: $('.relevent-main-post-btn-section').offset().top
+        }, 4000);
+    })
+
+});
+
+
+
+// var swiper = new Swiper(".mySwiperSecond", {
+//     slidesPerView: 3,
+//     spaceBetween: 10,
+//     pagination: {
+//         el: ".swiper-pagination",
+//         clickable: true,
+//     },
+//     navigation: {
+//         nextEl: ".swiper-button-next-1",
+//         prevEl: ".swiper-button-prev-1",
+//     },
+//     breakpoints: {
+//         640: {
+//             slidesPerView: 3,
+//             spaceBetween: 10,
+//         },
+//         768: {
+//             slidesPerView: 3,
+//             spaceBetween: 10,
+//         },
+//         1024: {
+//             slidesPerView: 3,
+//             spaceBetween: 10,
+//         },
+//     },
+// });
+
+var mainSlider = new Swiper(".mySwiperReviews", {
+    
+    slidesPerView: 4,
+    spaceBetween: 15,
+    pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+    },
+    navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+    },
+    breakpoints: {
+        640: {
+            slidesPerView: 4,
+            spaceBetween: 15,
+        },
+        768: {
+            slidesPerView: 4,
+            spaceBetween: 10,
+        },
+        1024: {
+            slidesPerView: 8,
+            spaceBetween: 10,
+        },
+    },
+});
+var swiper = new Swiper(".myBigSwiper", {
+    loop: true,
+    spaceBetween: 10,
+    slidesPerView: 8,
+    freeMode: true,
+    watchSlidesProgress: true,
+});
+var swiper2 = new Swiper(".myBigSwiper2", {
+    loop: true,
+    spaceBetween: 10,
+    navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+    },
+    thumbs: {
+        swiper: swiper,
+    },
+});
+
+//========================================================================================
+// Update next and prev buttons in both sliders
+$('.for-open-big-slider').on('click', function () {
+    var clickedIndex = mainSlider.clickedIndex;
+
+    // // Check if the index has changed
+    // if (swiper.activeIndex !== clickedIndex) {
+    //     // Change the slide of the main slider without transition
+    //     swiper.slideTo(clickedIndex, 0);
+
+    //     // Change the slide of the thumbnail slider without transition
+    //     swiper2.slideTo(clickedIndex, 0);
+    // }
+
+    // Show the overlay and the main outer section
+    $('#overlay').show();
+    $('.main-outer-sec').show();
+});
+
+// Update next and prev buttons when the main slider is changed
+// swiper.on('slideChange', function () {
+//     var activeIndex = swiper.activeIndex;
+
+//     // Change the slide of the thumbnail slider without transition
+//     swiper2.slideTo(activeIndex, 0);
+// });
+
+// // Update next and prev buttons when the thumbnail slider is changed
+// swiper2.on('slideChange', function () {
+//     var activeIndex = swiper2.activeIndex;
+
+//     // Change the slide of the main slider without transition
+//     swiper.slideTo(activeIndex, 0);
+// });
+
+//============================================================================================
+// $('.for-open-big-slider').on('click', function () {
+//     var clickedIndex = mainSlider.clickedIndex;
+
+//     // Change the slide of the thumbnail slider
+//     swiper2.slideTo(clickedIndex);
+//     $('#overlay').show();
+//     $('.main-outer-sec').show();
+// })
+
+$('.p-reviewslide').on('click', function () {
+    var reviewww = $(this).data('review-id');
+    console.log('.outer-review-' + reviewww);
+    $('#overlay').show();
+    $('.outer-review-' + reviewww).show();
+});
+
+$('.big-headerr-close-header').on('click', function () {
+    $('#overlay').hide();
+    $('.main-outer-sec').hide();
+})
+
+$(document).ready(function () {
+    $('.big-headerr-close-header-second').on('click', function () {
+        //alert('big-headerr-close-header-second')
+        var close_id = $(this).data('close-id');
+        // console.log('.outer-review-'+close_id)
+        $('#overlay').hide();
+        $('.outer-review-' + close_id).css('display', 'none');
+    })
+})
+
+document.addEventListener('DOMContentLoaded', function () {
+    var paginationContainer = document.querySelector('.reviews-pagination-container');
+    var reviewListContent = document.querySelector('.review-list-content');
+
+    window.addEventListener('scroll', function () {
+        if (reviewListContent.getBoundingClientRect().bottom <= 0) {
+            paginationContainer.classList.add('bottom-fixed');
+        } else {
+            paginationContainer.classList.remove('bottom-fixed');
+        }
+    });
+});
